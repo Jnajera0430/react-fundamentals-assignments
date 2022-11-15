@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState,useReducer } from "react";
 import { MainControls } from "./components/MainControls";
 import { SmartHome } from "./components/SmartHome";
+import {SmartHomeContext} from './SmartHomeContext'
+import {smartDevicesReducer} from './reducers/smartDevicesReducer'
 
 export function App() {
+  const [{ lights }, dispatch] = useReducer(smartDevicesReducer, {
+    lights: [false, false, true],
+  });
+  
   const [firstLightOn, setFirstLightOn] = useState(false);
   const [secondLightOn, setSecondLightOn] = useState(false);
   const [thirdLightOn, setThirdLightOn] = useState(true);
@@ -20,17 +26,20 @@ export function App() {
   };
 
   return (
-    <div>
-      <MainControls onAllOnClick={handleAllOn} onAllOffClick={handleAllOff} />
-
-      <SmartHome
-        firstLightOn={firstLightOn}
-        secondLightOn={secondLightOn}
-        thirdLightOn={thirdLightOn}
-        onFirstToggle={() => setFirstLightOn(!firstLightOn)}
-        onSecondToggle={() => setSecondLightOn(!secondLightOn)}
-        onThirdToggle={() => setThirdLightOn(!thirdLightOn)}
-      />
-    </div>
+    
+      <div>
+        <SmartHomeContext.Provider value={{ lights, dispatch }}>
+        <MainControls onAllOnClick={() => dispatch({ type: "allOn" })} onAllOffClick={() => dispatch({ type: "allOff" })} />
+        <SmartHome
+          firstLightOn={firstLightOn}
+          secondLightOn={secondLightOn}
+          thirdLightOn={thirdLightOn}
+          onFirstToggle={() => setFirstLightOn(!firstLightOn)}
+          onSecondToggle={() => setSecondLightOn(!secondLightOn)}
+          onThirdToggle={() => setThirdLightOn(!thirdLightOn)}
+          />
+        </SmartHomeContext.Provider>         
+      </div>
+    
   );
 }
